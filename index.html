@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>  
+CookIt</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#"><span class="logo"></span><span><h1>CookIt</h1></span></a>
+    <div class="nav-links"><a href="#featured">Featured</a><a href="#recipes">Recipes</a><a href="#newsletter">Newsletter</a></div>
+    <div class="cta"><button class="btn btn-primary">Submit Recipe</button></div>
+     <div class="menu-btn" id="menuBtn">&#9776;</div>
+  </div>
+  
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+     <h2>
+       UNLOCK THE ART OF COOKING WITH
+        <span style="background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent " >CookIt
+        </span>
+      </h2>
+      <p>Discover handpicked recipes, quick kitchen hacks, and global flavors. Filter by cuisine, diet, or time and start creating your culinary journey today.</p>
+      <div class="search">
+        <input id="search" class="input" placeholder="Search recipes, e.g., 'Biryani', 'Paneer'" />
+        <button class="btn btn-primary" onclick="searchRecipes()">Search</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-img"></div>
+      <div class="hero-stats">
+        <div class="stat"><b id="stat-recipes">0</b><div class="tex">Recipes</div></div>
+        <div class="stat"><b id="stat-favorites">0</b><div class="tex">Favorites</div></div>
+        <div class="stat"><b id="stat-quick">0</b><div class="tex">Under 20m</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FEATURE STRIP -->
+<section class="section" id="featured">
+  <div class="container strip">
+    <div class="tile"><div class="muted">🍽️ Featured</div><h4>Tandoori Chicken</h4><div class="muted">Smoky, juicy & classic.</div></div>
+    <div class="tile"><div class="muted">🥗 Quick</div><h4>Mint Raita</h4><div class="muted">Cool & 5‑minute prep.</div></div>
+    <div class="tile"><div class="muted">🍛 Veg</div><h4>Paneer Tikka</h4><div class="muted">Cottage cheese perfection.</div></div>
+    <div class="tile"><div class="muted">🍞 Bread</div><h4>Garlic Naan</h4><div class="muted">Soft, buttery, fluffy.</div></div>
+  </div>
+</section>
+<!-- Submit Recipe Modal -->
+<dialog id="submitModal">
+  <form id="submitForm">
+    <h3>Submit Your Recipe</h3>
+    <label>Recipe Name: <input type="text" name="name" required></label><br>
+    <label>Cooking Time (min): <input type="number" name="time" required></label><br>
+    <label>Veg? <input type="checkbox" name="veg"></label><br>
+    <label>Cuisine: <input type="text" name="cuisine" required></label><br>
+    <label>Tags (comma separated): <input type="text" name="tags"></label><br>
+    <label>Steps (comma separated): <input type="text" name="steps" required></label><br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="button" class="btn" onclick="submitModal.close()">Cancel</button>
+  </form>
+</dialog>
+
+<!-- Newsletter Modal (Optional Feedback) -->
+<dialog id="subscribeModal">
+  <div style="padding:20px;">
+    <h3>Subscribed Successfully!</h3>
+    <p>Thank you for subscribing to FlavorVerse newsletter.</p>
+    <button class="btn btn-primary" onclick="subscribeModal.close()">Close</button>
+  </div>
+</dialog>
+
+
+<!-- RECIPES GRID -->
+<section class="section" id="recipes">
+  <div class="container">
+    <div class="row" style="margin-bottom:12px">
+      <div class="row" style="gap:8px">
+        <select id="sort" class="input" style="width:190px"></select>
+        <button id="clear" class="btn">Clear Filters</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="section" id="newsletter">
+  <div class="container newsletter">
+    <div>
+      <h3>Get weekly flavors in your inbox</h3>
+      <p class="muted">New recipes, seasonal menus, and chef tips. No spam, cancel anytime.</p>
+      <div class="search"><input class="input" type="email" placeholder="Enter your email" /><button class="btn btn-primary">Subscribe</button></div>
+    </div>
+    <div style="background:#eadcee;border:1px solid white;border-radius:16px;padding:16px">
+      <div class="tex">This week’s picks</div>
+      <ul>
+        <li>Smoky Tandoori Drumsticks</li>
+        <li>Creamy Butter Paneer</li>
+        <li>Charred Corn Chaat</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="row1">
+    <div>© <span id="year"></span> <b>Made by @ KASHAF AKRAM:)</b></div>
+   
+  </div>
+</footer>
+
+<dialog id="modal">
+  <div class="modal-head"><strong id="m-title">Recipe</strong><button class="close" onclick="modal.close()">Close</button></div>
+  <div class="modal-body" id="m-body"></div>
+</dialog>
+
+<script>
+// --- Demo Data ---
+const RECIPES = [
+  {id:1,name:"Tandoori Chicken",time:45,veg:false,rating:4.9,cuisine:"Desi",tags:["Tandoor","Smoky"],calories:410,steps:["Marinate with yogurt, spices, lemon","Rest 1–2 hrs","Roast in hot oven/tandoor","Brush with butter, serve with onion"]},
+  {id:2,name:"Paneer Tikka",time:25,veg:true,rating:4.7,cuisine:"Desi",tags:["Tandoor","Starter"],calories:330,steps:["Marinate paneer cubes","Skewer with veggies","Roast until charred spots","Sprinkle chaat masala"]},
+  {id:3,name:"Garlic Naan",time:20,veg:true,rating:4.6,cuisine:"Bread",tags:["Tawa","Oven"],calories:260,steps:["Make soft dough","Proof 1 hour","Roll, brush garlic butter","Cook hot until puffed"]},
+  {id:4,name:"Mint Raita",time:5,veg:true,rating:4.5,cuisine:"Sides",tags:["Quick","Cooling"],calories:90,steps:["Blend mint + yogurt","Season & chill","Temper with cumin","Serve cold"]},
+  {id:5,name:"Smoky Dal Tadka",time:30,veg:true,rating:4.8,cuisine:"Desi",tags:["Dhungar","Comfort"],calories:220,steps:["Boil lentils","Make tadka","Use coal for smoke","Finish with ghee"]},
+];
+const CATEGORIES = ["All","Desi","BBQ","Bread","Sides","Veg","Non‑Veg","Quick","Tandoor"];
+let state={q:"",cat:"All",sort:"rating"};
+
+const grid=document.getElementById('grid');
+const chipsWrap=document.getElementById('chips');
+const searchInput=document.getElementById('search');
+const sortSel=document.getElementById('sort');
+const clearBtn=document.getElementById('clear');
+const modal=document.getElementById('modal');
+const mTitle=document.getElementById('m-title');
+const mBody=document.getElementById('m-body');
+
+// Utils
+const starSVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+const dishSVG='<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M3 19h18M3 19a9 9 0 1 1 18 0M7 9c0-2 1-3 3-4M13 5c1 .5 2 1.5 2 3"/></svg>';
+
+function card(r){
+  const favs=getFavs();
+  const fav=favs.includes(r.id);
+  return `<article class="card">
+    <div class="thumb">${dishSVG}</div>
+    <div class="card-body">
+      <div class="row">
+        <div>
+          <div class="title">${r.name}</div>
+          <div class="meta">${r.cuisine} • ${r.time} min • ${r.veg? 'Veg':'Non‑Veg'}</div>
+        </div>
+        <div class="rating" title="Rating">${starSVG}<b>${r.rating.toFixed(1)}</b></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="tag">${r.tags[0]||"Chef's pick"}</div>
+        <div class="actions">
+          <button class="btn-sm" onclick="toggleFav(${r.id})">${fav? '★ Saved':'☆ Save'}</button>
+          <button class="btn-sm primary" onclick='openRecipe(${JSON.stringify(r.id)})'>View</button>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderChips(){chipsWrap.innerHTML=CATEGORIES.map(c=>`<button class="chip ${state.cat===c?'active':''}" onclick="setCat('${c}')">${c}</button>`).join('');}
+function setCat(c){state.cat=c; render();}
+function filterData(){
+  const q=state.q.toLowerCase();
+  return RECIPES.filter(r=>
+    (state.cat==='All'||r.cuisine===state.cat||(state.cat==='Veg'&&r.veg)||(state.cat==='Non‑Veg'&&!r.veg)||(state.cat==='Quick'&&r.time<=20)||(state.cat==='Tandoor'&&r.tags.includes('Tandoor')))
+    && (r.name.toLowerCase().includes(q)||r.tags.join(' ').toLowerCase().includes(q))
+  );
+}
+function sortData(arr){
+  const a=[...arr];
+  if(state.sort==='rating') a.sort((x,y)=>y.rating-x.rating);
+  if(state.sort==='time') a.sort((x,y)=>x.time-y.time);
+  if(state.sort==='name') a.sort((x,y)=>x.name.localeCompare(y.name));
+  return a;
+}
+function render(){
+  const data=sortData(filterData());
+  grid.innerHTML=data.map(card).join('');
+  document.getElementById('stat-recipes').textContent=RECIPES.length;
+  document.getElementById('stat-quick').textContent=RECIPES.filter(r=>r.time<=20).length;
+  document.getElementById('stat-favorites').textContent=getFavs().length;
+}
+function openRecipe(id){
+  const r=RECIPES.find(x=>x.id===id); if(!r) return;
+  mTitle.textContent=r.name;
+  mBody.innerHTML=`<div class="meta" style="margin-bottom:10px">${r.cuisine} • ${r.time} min • ${r.veg? 'Veg':'Non‑Veg'} • ${r.calories} kcal</div><ol style="line-height:1.8">${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+  modal.showModal();
+}
+function getFavs(){try{return JSON.parse(localStorage.getItem('misto:favs')||'[]');}catch{return[];}}
+function setFavs(ids){localStorage.setItem('misto:favs',JSON.stringify(ids));}
+function toggleFav(id){const ids=getFavs();const i=ids.indexOf(id);if(i>-1) ids.splice(i,1); else ids.push(id); setFavs(ids); render();}
+function searchRecipes(){state.q=searchInput.value.trim(); render();}
+
+// Sort dropdown
+['rating','time','name'].forEach(v=>{sortSel.innerHTML+=`<option value="${v}">Sort: ${v.charAt(0).toUpperCase()+v.slice(1)}</option>`;});
+sortSel.addEventListener('change',()=>{state.sort=sortSel.value; render();});
+clearBtn.addEventListener('click',()=>{state={q:"",cat:"All",sort:sortSel.value};searchInput.value="";renderChips();render();});
+
+// Init
+renderChips(); render();
+
+document.getElementById('year').textContent=new Date().getFullYear();
+
+
+
+// --- Submit Recipe ---
+const submitModal = document.getElementById('submitModal');
+const submitForm = document.getElementById('submitForm');
+
+// Open modal on button click
+document.querySelector('.btn.btn-primary').addEventListener('click', () => {
+  submitModal.showModal();
+});
+
+// Handle submit form
+submitForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const formData = new FormData(submitForm);
+  
+  const newRecipe = {
+    id: Date.now(),
+    name: formData.get('name'),
+    time: parseInt(formData.get('time')),
+    veg: formData.get('veg') === 'on',
+    cuisine: formData.get('cuisine'),
+    tags: formData.get('tags').split(',').map(t=>t.trim()).filter(Boolean),
+    steps: formData.get('steps').split(',').map(s=>s.trim()).filter(Boolean),
+    rating: 0,
+    calories: 200
+  };
+  
+  RECIPES.push(newRecipe);
+  render();
+  submitModal.close();
+  submitForm.reset();
+  alert(`Recipe "${newRecipe.name}" submitted successfully!`);
+});
+
+// --- Newsletter Subscribe ---
+const subscribeInput = document.querySelector('#newsletter input[type="email"]');
+const subscribeBtn = document.querySelector('#newsletter button');
+const subscribeModal = document.getElementById('subscribeModal');
+
+subscribeBtn.addEventListener('click', () => {
+  const email = subscribeInput.value.trim();
+  if(!email || !email.includes('@')) {
+    alert('Please enter a valid email!');
+    return;
+  }
+  
+  // Save email to localStorage (or backend in real case)
+  let emails = JSON.parse(localStorage.getItem('flavorverse:emails') || '[]');
+  emails.push(email);
+  localStorage.setItem('flavorverse:emails', JSON.stringify(emails));
+  
+  subscribeInput.value = '';
+  subscribeModal.showModal();
+});
+
+  const menuBtn = document.querySelector(".menu-btn");
+  const navLinks = document.querySelector(".nav-links");
+
+  // Button click hone par toggle karo
+  menuBtn.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
+
+</script>
+</body>
+</html>
